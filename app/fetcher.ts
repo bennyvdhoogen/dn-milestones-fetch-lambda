@@ -280,7 +280,7 @@ export async function runFetchProcess(){
   for (const show of shows) {
     console.log(`Processing ${show.title} (${show.art19_id})`)
     let episodes = await fetchAllEpisodes(config.art19endpoint, show.art19_id);
-    iterateOverEpisodes(episodes);
+    await iterateOverEpisodes(episodes);
   }
 
   console.log('Completed fetch program..');
