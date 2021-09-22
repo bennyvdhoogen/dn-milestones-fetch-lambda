@@ -255,6 +255,7 @@ export async function iterateOverEpisodes(episodes: any) {
       episodesProcessed++;
 
       if(episodes.length == episodesProcessed){
+        console.log(`All episodes processed for ${dbShow.title} (${dbShow.art19_id})`);
         await updateShowListenCount(dbShow.id, show_total_listen_count)
         await calculateMilestones();
         await calculateShowDailyIncrement(dbShow.id);
