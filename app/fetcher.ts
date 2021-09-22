@@ -22,7 +22,6 @@ export async function getAllShowFromDb(){
     const shows = await client.query(
         `SELECT * FROM shows WHERE active = '1';`
     );
-    console.log(shows);
     return shows;
 }
 
@@ -42,7 +41,6 @@ export async function fetchEpisode(art19endpoint: string, episode_id: string){
 
 export async function fetchEpisodeLinksPage(originUrl: string)
 {
-  console.log(originUrl);
   const currentResponse = await fetch(originUrl, {
     method: "GET",
     headers: {
@@ -52,8 +50,6 @@ export async function fetchEpisodeLinksPage(originUrl: string)
   });
 
   const data = await currentResponse.json();
-
-  //console.log(data);
 
   return data;
 }
