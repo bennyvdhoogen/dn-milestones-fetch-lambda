@@ -279,3 +279,17 @@ export async function iterateOverEpisodes(episodes: any) {
     //   }
     // });
   }
+
+export async function runFetchProcess(){
+  console.log('start running');
+  let shows = await getAllShowFromDb();
+
+  for (const show of shows) {
+    let episodes = await fetchAllEpisodes(config.art19endpoint, show.art19_id);
+    iterateOverEpisodes(episodes);
+  }
+
+  console.log('completed running');
+  console.log(shows);
+  return;
+}
