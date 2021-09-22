@@ -9,6 +9,8 @@ dotEnvConfig({ export: true, path: './.env'});
 const env = Deno.env.toObject();
 const client = await new Client();
 
+let art19reqcounter = 0;
+
 client.connect({
   hostname: env.MYSQL_HOSTNAME,
   username: env.MYSQL_USERNAME,
@@ -27,6 +29,8 @@ export async function getAllShowFromDb(){
 
 export async function fetchART19(url: string, absolute_url?: string)
 {
+  art19reqcounter++;
+
   let requestUri = config.art19endpoint + url;
 
   if (absolute_url) {
@@ -34,6 +38,8 @@ export async function fetchART19(url: string, absolute_url?: string)
   }
 
   // console.log(requestUri); // Enabled to log all requests to ART19
+  // console.log('Num req: ' + art19reqcounter); // Show amount of requests done
+
 
   const response = await fetch(requestUri, {
     method: "GET",
