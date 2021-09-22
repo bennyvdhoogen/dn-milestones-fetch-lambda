@@ -20,8 +20,9 @@ await client.execute(`USE ${config.DATABASE}`);
 
 export async function getAllShowFromDb(){
     const shows = await client.query(
-        `SELECT * FROM shows WHERE active = 1;`
+        `SELECT * FROM shows WHERE active = '1';`
     );
+    console.log(shows);
     return shows;
 }
 
@@ -41,6 +42,7 @@ export async function fetchEpisode(art19endpoint: string, episode_id: string){
 
 export async function fetchEpisodeLinksPage(originUrl: string)
 {
+  console.log(originUrl);
   const currentResponse = await fetch(originUrl, {
     method: "GET",
     headers: {
@@ -58,6 +60,10 @@ export async function fetchEpisodeLinksPage(originUrl: string)
 
 export async function* episodeIterator(episodesObj: any)
 {
+  if(!episodesObj.links.next){
+    return;
+  }
+
   while (true) {
     const { data, links } = await fetchEpisodeLinksPage(episodesObj.links.next);
     episodesObj.data = data;
@@ -82,15 +88,11 @@ export async function fetchAllEpisodes(art19endpoint: string, series_id: string)
 
     // return array of episodes
     const data = await response.json();
-    const allEps = [];
-
-    //const allEpisodePages = await episodeIterator(data.data.relationships.episodes);
+    const allEps = data.data.relationships.episodes.data; // Start with the first page of results
 
     for await (const ep of episodeIterator(data.data.relationships.episodes)) {
-      //console.log(ep);
       allEps.push(ep);
     }
-
     console.log(`Fetched ${allEps.length} episodes for ${series_id}`)
 
     return allEps;
