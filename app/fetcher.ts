@@ -25,14 +25,31 @@ export async function getAllShowFromDb(){
     return shows;
 }
 
+export async function fetchART19(url: string, absolute_url?: string)
+{
+  let requestUri = config.art19endpoint + url;
+
+  if (absolute_url) {
+    requestUri = absolute_url;
+  }
+
+  // console.log(requestUri); // Enabled to log all requests to ART19
+
+  const response = await fetch(requestUri, {
+    method: "GET",
+    headers: {
+      Accept:        "application/vnd.api+json",
+      Authorization: 'Token token="'+env.ART19_TOKEN+'", credential="'+env.ART19_CREDENTIAL+'"'
+    }
+  });
+
+  //console.log(requestUri);
+
+  return response;
+}
+
 export async function fetchEpisode(art19endpoint: string, episode_id: string){
-    const response = await fetch(art19endpoint + '/episodes/' + episode_id, {
-      method: "GET",
-      headers: {
-        Accept:        "application/vnd.api+json",
-        Authorization: 'Token token="'+env.ART19_TOKEN+'", credential="'+env.ART19_CREDENTIAL+'"'
-      }
-    });
+    const response = await fetchART19('episodes/' + episode_id);
 
     // return episode item
     const data = await response.json();
@@ -41,13 +58,7 @@ export async function fetchEpisode(art19endpoint: string, episode_id: string){
 
 export async function fetchEpisodeLinksPage(originUrl: string)
 {
-  const currentResponse = await fetch(originUrl, {
-    method: "GET",
-    headers: {
-      Accept:        "application/vnd.api+json",
-      Authorization: 'Token token="'+env.ART19_TOKEN+'", credential="'+env.ART19_CREDENTIAL+'"'
-    }
-  });
+  const currentResponse = await fetchART19('', originUrl);
 
   const data = await currentResponse.json();
 
@@ -74,13 +85,7 @@ export async function* episodeIterator(episodesObj: any)
 
 export async function fetchAllEpisodes(art19endpoint: string, series_id: string){
     // fetch show
-    const response = await fetch(art19endpoint + '/series/' + series_id, {
-      method: "GET",
-      headers: {
-        Accept:        "application/vnd.api+json",
-        Authorization: 'Token token="'+env.ART19_TOKEN+'", credential="'+env.ART19_CREDENTIAL+'"'
-      }
-    });
+    const response = await fetchART19('series/' + series_id);
 
     // return array of episodes
     const data = await response.json();
@@ -230,8 +235,11 @@ export async function iterateOverEpisodes(episodes: any) {
 
     for (const episode of episodes){
       const data = await fetchEpisode(config.art19endpoint, episode.id);
-      let dbShow = await getShowFromDb(data.data.attributes.series_id);
+      if (typeof(data.data) == 'undefined'){
+        continue;
+      }
 
+      let dbShow = await getShowFromDb(data.data.attributes.series_id);
       let measurement = {
         show_id: null,
         episode_id: null,
