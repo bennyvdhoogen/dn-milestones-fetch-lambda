@@ -1,8 +1,7 @@
 import { Client } from "https://deno.land/x/mysql/mod.ts";
 import * as config from "../config.ts";
+import * as helpers from "./helpers.ts";
 import { config as dotEnvConfig } from 'https://deno.land/x/dotenv@v1.0.1/mod.ts';
-import * as emoji from "https://deno.land/x/emoji/mod.ts";
-import { XmlEntities } from "https://deno.land/x/html_entities@v1.0/mod.js";
 
 dotEnvConfig({ export: true, path: './.env'});
 
@@ -37,8 +36,8 @@ export async function fetchART19(url: string, absolute_url?: string)
     requestUri = absolute_url;
   }
 
-  // console.log(requestUri); // Enabled to log all requests to ART19
-  // console.log('Num req: ' + art19reqcounter); // Show amount of requests done
+  //console.log(requestUri); // Enabled to log all requests to ART19
+  console.log('Num req: ' + art19reqcounter); // Show amount of requests done
 
 
   const response = await fetch(requestUri, {
@@ -48,8 +47,6 @@ export async function fetchART19(url: string, absolute_url?: string)
       Authorization: 'Token token="'+env.ART19_TOKEN+'", credential="'+env.ART19_CREDENTIAL+'"'
     }
   });
-
-  //console.log(requestUri);
 
   return response;
 }
@@ -109,12 +106,12 @@ export async function insertEpisodeIntoDb(show_id: number, episode: any) {
     // select db
     await client.execute(`USE ${config.DATABASE}`);
 
-      const title = XmlEntities.encode(emoji.strip(episode.attributes.title).replace("'","")); // strip quotes
+      let title = helpers.sanitizeString(episode.attributes.title); // strip quotes
       const listen_count = parseInt(episode.attributes.listen_count);
 
-
       // upsert into episodes table
-      await client.execute(`
+
+      return await client.execute(`
       INSERT INTO episodes (show_id, art19_id, title, listen_count) VALUES ('${show_id}','${episode.id}','${title}','${episode.attributes.listen_count}')
       ON DUPLICATE KEY UPDATE listen_count = ${episode.attributes.listen_count};
     `);
@@ -257,7 +254,7 @@ export async function iterateOverEpisodes(episodes: any) {
 
       // sum listen count
       show_total_listen_count += data.data.attributes.listen_count;
-      insertEpisodeIntoDb(dbShow.id, data.data).then(async function() {
+      await insertEpisodeIntoDb(dbShow.id, data.data).then(async function() {
         let dbEpisode = await getEpisodeFromDb(data.data.id);
         let dbShow = await getShowFromDb(data.data.attributes.series_id);
         measurement.episode_id = dbEpisode.id;
