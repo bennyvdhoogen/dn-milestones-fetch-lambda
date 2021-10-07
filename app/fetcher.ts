@@ -70,14 +70,19 @@ export async function fetchEpisodeLinksPage(originUrl: string)
 
 export async function* episodeIterator(episodesObj: any)
 {
-  if(!episodesObj.links.next){
+  if (!episodesObj.links.next) {
     return;
   }
 
   while (true) {
     const { data, links } = await fetchEpisodeLinksPage(episodesObj.links.next);
+    if (!data) {
+      break;
+    }
+
     episodesObj.data = data;
     episodesObj.links = links;
+
     for (const item of data) {
       yield item;
     }
