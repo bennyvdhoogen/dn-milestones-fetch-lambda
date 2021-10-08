@@ -21,7 +21,7 @@ await client.execute(`USE ${config.DATABASE}`);
 
 export async function getAllShowFromDb(){
     const shows = await client.query(
-        `SELECT * FROM shows WHERE active = '1';`
+        `SELECT * FROM shows WHERE active = '1' AND (updated_at <= DATE_SUB(NOW(), INTERVAL ${env.UPDATE_INTERVAL_HOURS} HOUR) OR updated_at IS NULL) LIMIT 5;`
     );
     return shows;
 }
@@ -127,8 +127,8 @@ export async function updateShowListenCount(show_id: number, total_listen_count:
     // select db
     await client.execute(`USE ${config.DATABASE}`);
     // insert into episodes table
-      await client.execute(`
-      UPDATE shows SET total_listen_count =  '${total_listen_count}' WHERE id = '${show_id}';
+    await client.execute(`
+      UPDATE shows SET total_listen_count =  '${total_listen_count}', updated_at = NOW() WHERE id = '${show_id}';
     `);
   };
 
