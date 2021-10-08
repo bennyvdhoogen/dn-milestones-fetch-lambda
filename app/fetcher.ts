@@ -87,7 +87,10 @@ export async function* episodeIterator(episodesObj: any)
       yield item;
     }
 
-    if (links.next === links.last) break;
+    // Stop looping if current page is last
+    if (links.self === links.last) {
+      break;
+    }
   }
 }
 
