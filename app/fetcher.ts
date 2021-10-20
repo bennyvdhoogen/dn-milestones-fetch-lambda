@@ -203,7 +203,7 @@ export async function markMilestoneAsReach(show_milestone: any)
 
 export async function calculateMilestones(){
     const milestonesReached = await client.query(
-      `SELECT a.id as milestone_id, b.id as show_id, a.value, a.created_at FROM milestones a LEFT JOIN shows b ON a.show_id = b.id WHERE a.type = 'total_listen_count' AND b.total_listen_count >= a.value`
+      `SELECT a.id as milestone_id, b.id as show_id, a.value, a.created_at FROM milestones a LEFT JOIN shows b ON a.show_id = b.id WHERE a.type = 'total_listen_count' AND b.total_listen_count >= a.value AND a.reached_at = '0000-00-00'`
     );
     // mark milestones as reached
   //   milestonesReached.forEach((show_milestone: any) => {
