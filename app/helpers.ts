@@ -1,4 +1,4 @@
-import * as emoji from "https://deno.land/x/emoji/mod.ts";
+import * as emoji from "https://deno.land/x/emoji@0.1.2/mod.ts";
 import { XmlEntities } from "https://deno.land/x/html_entities@v1.0/mod.js";
 
 export function sanitizeString(input: string)
