@@ -37,7 +37,7 @@ export async function fetchART19(url: string, absolute_url?: string)
   }
 
   //console.log(requestUri); // Enabled to log all requests to ART19
-  console.log('Num req: ' + art19reqcounter); // Show amount of requests done
+  //console.log('Num req: ' + art19reqcounter); // Show amount of requests done
 
 
   const response = await fetch(requestUri, {
