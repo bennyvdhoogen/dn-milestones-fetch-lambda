@@ -1,4 +1,4 @@
-import { Client } from "https://deno.land/x/mysql/mod.ts";
+import { Client } from "https://deno.land/x/mysql@v2.10.2/mod.ts";
 import * as config from "../config.ts";
 import * as helpers from "./helpers.ts";
 import { config as dotEnvConfig } from 'https://deno.land/x/dotenv@v1.0.1/mod.ts';
